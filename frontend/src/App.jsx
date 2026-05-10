@@ -13,11 +13,11 @@ function App() {
     try {
       setStatus('Adatok frissítése...');
       // Itt hívjuk meg a majdani Node.js szerveredet
-      const resProd = await axios.get('http://localhost:5000/api/products');
+      const resProd = await axios.get('http://localhost:5050/api/products');
       setProducts(resProd.data);
       
       // Ez a rész a DQS bemutatásához kell majd
-      const resCust = await axios.get('http://localhost:5000/api/customers');
+      const resCust = await axios.get('http://localhost:5050/api/customers');
       setCustomers(resCust.data);
       
       setStatus('Rendszer online');
@@ -26,6 +26,8 @@ function App() {
       setStatus('Hiba: A backend nem elérhető');
     }
   };
+
+  console.log(customers)
 
   useEffect(() => {
     fetchData();
