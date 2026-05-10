@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models
 {
-    public class Product
+    public class ProductModel
     {
         [Key]
         public int ProductId { get; set; }
