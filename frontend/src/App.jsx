@@ -28,6 +28,7 @@ function App() {
   };
 
   console.log(customers)
+  console.log(products)
 
   useEffect(() => {
     fetchData();
@@ -78,10 +79,10 @@ function App() {
               <tbody>
                 {products.length > 0 ? products.map(p => (
                   <tr key={p.ProductID} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={{ padding: '12px' }}>{p.ProductID}</td>
-                    <td style={{ padding: '12px', fontWeight: 'bold' }}>{p.ProductName}</td>
-                    <td style={{ padding: '12px' }}>{p.Price} USD</td>
-                    <td style={{ padding: '12px' }}>{p.StockLevel} db</td>
+                    <td style={{ padding: '12px' }}>{p.productId}</td>
+                    <td style={{ padding: '12px', fontWeight: 'bold' }}>{p.productName}</td>
+                    <td style={{ padding: '12px' }}>{p.price} USD</td>
+                    <td style={{ padding: '12px' }}>{p.stockLevel} db</td>
                     <td style={{ padding: '12px' }}>
                       <button style={{ backgroundColor: '#28a745', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer' }}>Szerkesztés</button>
                     </td>
