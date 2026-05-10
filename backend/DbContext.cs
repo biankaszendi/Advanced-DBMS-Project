@@ -3,9 +3,9 @@ using backend.Models;
 
 namespace backend.Data
 {
-    public class DbContext : DbContext
+    public class AppDbContext : DbContext
     {
-        public DbContext(DbContextOptions<DbContext> options) : base(options) { }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<ProductModel> Products { get; set; }
         public DbSet<CustomerModel> Customers { get; set; }
