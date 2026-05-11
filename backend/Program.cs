@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using backend.Data;
+using backend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
-
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<CustomerService>();
 builder.Services.AddCors(options =>
 {
 options.AddDefaultPolicy(policy =>
@@ -23,15 +25,12 @@ options.AddDefaultPolicy(policy =>
 
 builder.Services.AddControllers();
 
-
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
 
 app.UseHttpsRedirection();
 
