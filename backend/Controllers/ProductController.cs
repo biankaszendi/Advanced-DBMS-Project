@@ -14,11 +14,9 @@ namespace backend.Controllers
     [Route("/api/products")]
     public class ProductController : ControllerBase
     {
-        private AppDbContext _context;
         private readonly ProductService _productService;
-        public ProductController(AppDbContext context, ProductService productService)
+        public ProductController(ProductService productService)
         {
-            _context = context;
             _productService = productService;
         }
 
