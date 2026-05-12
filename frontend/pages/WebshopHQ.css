@@ -92,3 +92,53 @@
     background-color: #f0f2f5;
     min-height: 100vh;
 }
+.section-title {
+    color: #0062cc;
+    margin-bottom: 20px;
+}
+
+/* A teljes fejléc konténer */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+}
+
+.header-title {
+    margin-left: 15px;
+    font-size: 24px;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.header-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.status-online { color: green; }
+.status-error { color: red; }
+
+.nav-bar {
+    margin: 25px 0;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap; 
+}
+
+.nav-bar .refresh-button {
+    margin-left: auto;
+}

@@ -111,15 +111,16 @@ const handleShipOrder = async (orderId) => {
   return (
     <div className="app-container">
       <header className="app-header">
-        <div className="header-content">
-          <Database size={32} color="#0062cc" />
-          <h1 className="header-title">Advanced DBMS Project Admin</h1>
-        </div>
-        <div className="header-status">
-          <AlertCircle size={18} />
-          <span>{status}</span>
-        </div>
-      </header>
+    <div className="header-content">
+      <Database size={32} color="#0062cc" />
+      <h1 className="header-title">Advanced DBMS Project Admin</h1>
+    </div>
+    
+    <div className={`header-status ${status.includes('Error') ? 'status-error' : 'status-online'}`}>
+      <AlertCircle size={18} />
+      <span>{status}</span>
+    </div>
+  </header>
 
       <nav className="nav-bar">
         <button 
@@ -160,7 +161,7 @@ const handleShipOrder = async (orderId) => {
         </button>
         <button 
           onClick={fetchData} 
-          className="nav-button"
+          className="nav-button refresh-button"
         >
           <RefreshCw size={18} /> Refresh
         </button>
@@ -330,7 +331,7 @@ const handleShipOrder = async (orderId) => {
         {/* Audit logs view */}
         {view === 'logs' && (
           <section>
-            <h2 style={{ color: '#0062cc' }}>System Audit Logs (Logging)</h2>
+            <h2 className="section-title">System Audit Logs (Logging)</h2>
             <div style={{ maxHeight: '400px', overflowY: 'auto', marginTop: '20px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
