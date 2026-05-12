@@ -2,6 +2,7 @@ using backend.Data;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 using backend.DTOs;
+using Microsoft.Data.SqlClient;
 
 namespace backend.Services
 {
@@ -18,16 +19,21 @@ namespace backend.Services
         {
             try
             {
+                var p1 = new SqlParameter("@CustomerID", request.CustomerID);
+                var p2 = new SqlParameter("@ProductID", request.ProductID);
+                var p3 = new SqlParameter("@Quantity", request.Quantity);
+                var p4 = new SqlParameter("@TotalAmount", request.TotalAmount);
+
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC sp_PlaceOrder @CustomerID={0}, @ProductID={1}, @Quantity={2}, @TotalAmount={3}",
-                    request.CustomerID, request.ProductID, request.Quantity, request.TotalAmount);
+                    "EXEC sp_PlaceOrder @CustomerID, @ProductID, @Quantity, @TotalAmount", 
+                    p1, p2, p3, p4);
                 
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Hiba: {ex.Message}");
-                return false;
+                Console.WriteLine($"SQL Error: {ex.Message}");
+                throw; 
             }
         }
 

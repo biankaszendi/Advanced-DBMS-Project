@@ -6,7 +6,7 @@ using backend.DTOs;
 namespace backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/orders")]
     public class OrderController : ControllerBase
     {
         private readonly OrderService _orderService;
