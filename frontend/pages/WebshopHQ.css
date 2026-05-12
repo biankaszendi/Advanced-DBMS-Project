@@ -35,3 +35,60 @@
 .read-the-docs {
   color: #888;
 }
+.table-cell {
+    padding: 12px;
+}
+
+.input-field {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+.input-field:focus {
+    border-color: #0062cc;
+}
+
+.nav-button {
+    padding: 12px 20px;
+    background-color: white;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.nav-button.active {
+    background-color: #0062cc;
+    color: white;
+    border: none;
+}
+
+.nav-button:hover:not(.active) {
+    background-color: #f8f9fa;
+}
+
+.stat-card {
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.card-blue { background-color: #e7f1ff; color: #0062cc; }
+.card-green { background-color: #eafaf1; color: #28a745; }
+.card-orange { background-color: #fff5e6; color: #fd7e14; }
+.card-red { background-color: #fdf2f2; color: #dc3545; }
+
+.app-container {
+    font-family: 'Segoe UI', sans-serif;
+    padding: 30px;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+}
