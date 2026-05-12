@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using backend.Models;
+using backend.DTOs;
 
 namespace backend.Data
 {
@@ -12,5 +13,17 @@ namespace backend.Data
         public DbSet<OrderModel> Orders { get; set; }
         public DbSet<OrderDetailModel> OrderDetails { get; set; }
         public DbSet<AuditLogModel> AuditLogs { get; set; }
+        public DbSet<DashboardStats> DashboardStats { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder); 
+
+            modelBuilder.Entity<DashboardStats>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView("v_SalesDashboard"); 
+            });
+        }
     }
 }

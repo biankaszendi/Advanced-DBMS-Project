@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Database, ShoppingCart, Users, RefreshCw, AlertCircle, PackageCheck, Eraser } from 'lucide-react';
+import { Database, ShoppingCart, Users, RefreshCw, AlertCircle, PackageCheck, Eraser, LayoutDashboard} from 'lucide-react';
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -8,6 +8,8 @@ function App() {
   const [view, setView] = useState('products');
   const [status, setStatus] = useState('Loading...');
   const [auditLogs, setAuditLogs] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [stats, setStats] = useState({ totalOrders: 0, totalRevenue: 0, bestSellingProduct: '', failedAttempts: 0 });
   
   const [order, setOrder] = useState({ customerID: '', productID: '', quantity: 1 });
 
@@ -25,6 +27,12 @@ function App() {
       const resLogs = await axios.get(`${API_BASE}/auditlogs`);
       setAuditLogs(resLogs.data);
 
+      const resStats = await axios.get(`${API_BASE}/dashboard`);
+      setStats(resStats.data);
+
+      const resOrders = await axios.get(`${API_BASE}/orders`);
+      setOrders(resOrders.data);
+
       setStatus('System online');
     } catch (err) {
       console.error("Error:", err);
@@ -34,7 +42,7 @@ function App() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [view]);
 
   const handlePlaceOrder = async (e) => {
   e.preventDefault();
@@ -51,9 +59,15 @@ function App() {
 
   try {
     setStatus('Sending order...');
-    const selectedProd = products.find(p => p.productID === pID);
-    const total = selectedProd ? selectedProd.price * qty : 0;
+    const selectedProd = products.find(p => p.productId === pID);
+    const unitPrice = selectedProd ? selectedProd.price : 0;
+    const total = unitPrice * qty;
 
+    if (total === 0) {
+        alert("Error: Total amount is 0. Check product selection!");
+        return;
+      }
+      
     await axios.post(`${API_BASE}/orders`, {
       customerID: cID,
       productID: pID,
@@ -72,11 +86,21 @@ function App() {
     } else {
       alert("Network error or the server is not responding.");
     }
-    
+
     await fetchData();
   
     setStatus('Order error');
     console.error("Details:", err);
+  }
+};
+
+const handleShipOrder = async (orderId) => {
+  try {
+    await axios.patch(`${API_BASE}/orders/${orderId}/ship`);
+    alert("Order shipped!");
+    fetchData(); 
+  } catch (err) {
+    alert("Error updating order status.");
   }
 };
 
@@ -98,13 +122,19 @@ function App() {
           <ShoppingCart size={18} /> Products
         </button>
         <button onClick={() => setView('customers')} style={navButtonStyle(view === 'customers')}>
-          <Users size={18} /> Editing Customers 
+          <Users size={18} />Customers 
         </button>
         <button onClick={() => setView('order')} style={navButtonStyle(view === 'order')}>
           <PackageCheck size={18} /> New Order
         </button>
+        <button onClick={() => setView('history')} style={navButtonStyle(view === 'history')}>
+          <RefreshCw size={18} /> Order History
+        </button>
         <button onClick={() => setView('logs')} style={navButtonStyle(view === 'logs')}>
           <Database size={18} /> Audit Logs
+        </button>
+        <button onClick={() => setView('dashboard')} style={navButtonStyle(view === 'dashboard')}>
+          <LayoutDashboard size={18} /> Dashboard
         </button>
         <button onClick={fetchData} style={{ ...navButtonStyle(false), marginLeft: 'auto' }}>
           <RefreshCw size={18} /> Refresh
@@ -215,6 +245,63 @@ function App() {
             </form>
           </section>
         )}
+        {/* Order history view */}
+        {view === 'history' && (
+          <section>
+            <h2 style={{ color: '#0062cc' }}>Order Management</h2>
+            <div style={{ marginTop: '20px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#f8f9fa', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>
+                    <th style={tStyle}>Order ID</th>
+                    <th style={tStyle}>Date</th>
+                    <th style={tStyle}>Amount</th>
+                    <th style={tStyle}>Status</th>
+                    <th style={tStyle}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map(o => (
+                    <tr key={o.orderID} style={{ borderBottom: '1px solid #eee' }}>
+                      <td style={tStyle}>#{o.orderID}</td>
+                      <td style={tStyle}>{new Date(o.orderDate).toLocaleString('hu-HU')}</td>
+                      <td style={tStyle}>${o.totalAmount}</td>
+                      <td style={tStyle}>
+                        <span style={{ 
+                          padding: '4px 8px', 
+                          borderRadius: '12px', 
+                          fontSize: '12px',
+                          backgroundColor: o.status === 'Shipped' ? '#e8f5e9' : '#fff3e0',
+                          color: o.status === 'Shipped' ? '#2e7d32' : '#e65100'
+                        }}>
+                          {o.status}
+                        </span>
+                      </td>
+                      <td style={tStyle}>
+                        {o.status === 'Pending' && (
+                          <button 
+                            onClick={() => handleShipOrder(o.orderID)}
+                            style={{ 
+                              backgroundColor: '#28a745', 
+                              color: 'white', 
+                              border: 'none', 
+                              padding: '6px 12px', 
+                              borderRadius: '4px', 
+                              cursor: 'pointer',
+                              fontSize: '12px'
+                            }}
+                          >
+                            Ship Order
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
         {/* Audit logs view */}
         {view === 'logs' && (
           <section>
@@ -247,6 +334,38 @@ function App() {
             </div>
           </section>
         )}
+        {view === 'dashboard' && (
+        <section>
+          <h2 style={{ color: '#0062cc', marginBottom: '20px' }}>Business Intelligence Dashboard</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+            
+            {/* Total revenue */}
+            <div style={cardStyle('#e3f2fd', '#0d47a1')}>
+              <h3>Total Revenue</h3>
+              <p style={{ fontSize: '24px', fontWeight: 'bold' }}>${stats.totalRevenue.toLocaleString()}</p>
+            </div>
+
+            {/* Orders placed */}
+            <div style={cardStyle('#f1f8e9', '#1b5e20')}>
+              <h3>Orders Placed</h3>
+              <p style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.totalOrders}</p>
+            </div>
+
+            {/* Best seller */}
+            <div style={cardStyle('#fff3e0', '#e65100')}>
+              <h3>Best Seller</h3>
+              <p style={{ fontSize: '18px', fontWeight: 'bold' }}>{stats.bestSellingProduct}</p>
+            </div>
+
+            {/* Failed attempts */}
+            <div style={cardStyle('#ffeea1', '#b71c1c')}>
+              <h3 style={{color: stats.failedAttempts > 0 ? '#b71c1c' : 'inherit'}}>Failed Attempts</h3>
+              <p style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.failedAttempts}</p>
+            </div>
+            
+          </div>
+        </section>
+      )}
       </main>
     </div>
   );
@@ -267,6 +386,15 @@ const navButtonStyle = (active) => ({
   gap: '10px',
   fontWeight: '600',
   transition: '0.2s'
+});
+
+const cardStyle = (bg, color) => ({
+  backgroundColor: bg,
+  color: color,
+  padding: '20px',
+  borderRadius: '12px',
+  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+  textAlign: 'center'
 });
 
 export default App;

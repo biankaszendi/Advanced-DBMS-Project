@@ -45,5 +45,16 @@ namespace backend.Controllers
         {
             return Ok(await _orderService.GetAllOrders());
         }
+
+        [HttpPatch("{id}/ship")]
+        public async Task<IActionResult> ShipOrder(int id)
+        {
+            var order = await _orderService.GetOrderByIdAsync(id);
+            if (order == null) return NotFound();
+
+            await _orderService.ShipOrderAsync(order);
+
+            return Ok(new { message = "Order shipped successfully!" });
+        }
     }
 }

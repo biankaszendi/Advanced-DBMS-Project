@@ -59,5 +59,23 @@ namespace backend.Services
 
         public async Task<List<OrderModel>> GetAllOrders() 
             => await _context.Orders.Include(o => o.Customer).ToListAsync();
+
+        public async Task<OrderModel> GetOrderByIdAsync(int id)
+        {
+            return await _context.Orders.FindAsync(id);
+        }
+
+        public async Task ShipOrderAsync(OrderModel order)
+        {
+            order.Status = "Shipped";
+
+            _context.AuditLogs.Add(new AuditLogModel 
+            { 
+                EventDescription = $"ORDER SHIPPED: Order ID {order.OrderID} status changed to Shipped.",
+                EventDate = DateTime.Now
+            });
+
+            await _context.SaveChangesAsync();
+        }
     }
 }
