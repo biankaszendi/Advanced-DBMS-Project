@@ -1,3 +1,7 @@
+import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+import WebshopHQ from "../pages/WebshopHQ";
+import WebshopRegional from "../pages/WebshopRegional";
+import "./App.css";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Database, ShoppingCart, Users, RefreshCw, AlertCircle, PackageCheck, Eraser, LayoutDashboard} from 'lucide-react';
