@@ -16,15 +16,28 @@ namespace backend.Controllers
             _orderService = orderService;
         }
 
-        [HttpPost]
+       [HttpPost]
         public async Task<IActionResult> PlaceOrder([FromBody] OrderRequest request)
         {
-            var success = await _orderService.PlaceOrderAsync(request);
-            
-            if (success)
-                return Ok(new { message = "Order placed successfully!" });
-            
-            return BadRequest(new { message = "Error occurred while placing the order (possibly insufficient inventory)." });
+            try 
+            {
+                var success = await _orderService.PlaceOrderAsync(request);
+                
+                if (success)
+                {
+                    return Ok(new { message = "Order placed successfully!" });
+                }
+
+                return BadRequest(new { message = "Order failed" });
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("stock"))
+                {
+                    return BadRequest(new { message = "Low stock" });
+                }
+                return BadRequest(new { message = "Database error: " + ex.Message });
+            }
         }
 
         [HttpGet]

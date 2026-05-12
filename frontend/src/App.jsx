@@ -7,10 +7,12 @@ function App() {
   const [customers, setCustomers] = useState([]);
   const [view, setView] = useState('products');
   const [status, setStatus] = useState('Loading...');
+  const [auditLogs, setAuditLogs] = useState([]);
   
   const [order, setOrder] = useState({ customerID: '', productID: '', quantity: 1 });
 
   const API_BASE = 'http://localhost:5050/api'; 
+
   const fetchData = async () => {
     try {
       setStatus('Fetching data...');
@@ -19,7 +21,10 @@ function App() {
       
       const resCust = await axios.get(`${API_BASE}/customers`);
       setCustomers(resCust.data);
-      
+
+      const resLogs = await axios.get(`${API_BASE}/auditlogs`);
+      setAuditLogs(resLogs.data);
+
       setStatus('System online');
     } catch (err) {
       console.error("Error:", err);
@@ -38,6 +43,7 @@ function App() {
   const cID = parseInt(order.customerID);
   const pID = parseInt(order.productID);
   const qty = parseInt(order.quantity);
+
   if (!cID || !pID) {
     alert("Please select a customer and a product!");
     return;
@@ -56,12 +62,21 @@ function App() {
     });
 
     alert("Successfully placed order!");
-    fetchData(); 
+    await fetchData(); 
     setOrder({ customerID: '', productID: '', quantity: 1 }); 
-  } catch (err) {
-    const msg = err.response?.data?.message || err.message;
-    alert("Error: " + msg);
+    } catch (err) {
+    const serverErrorMessage = err.response?.data?.message || err.response?.data;
+    
+    if (serverErrorMessage) {
+      alert("Error during order placement: " + serverErrorMessage);
+    } else {
+      alert("Network error or the server is not responding.");
+    }
+    
+    await fetchData();
+  
     setStatus('Order error');
+    console.error("Details:", err);
   }
 };
 
@@ -88,6 +103,9 @@ function App() {
         <button onClick={() => setView('order')} style={navButtonStyle(view === 'order')}>
           <PackageCheck size={18} /> New Order
         </button>
+        <button onClick={() => setView('logs')} style={navButtonStyle(view === 'logs')}>
+          <Database size={18} /> Audit Logs
+        </button>
         <button onClick={fetchData} style={{ ...navButtonStyle(false), marginLeft: 'auto' }}>
           <RefreshCw size={18} /> Refresh
         </button>
@@ -106,6 +124,7 @@ function App() {
                   <th style={tStyle}>Name</th>
                   <th style={tStyle}>Price</th>
                   <th style={tStyle}>Stock</th>
+                  <th style={tStyle}>Last Update</th>
                 </tr>
               </thead>
               <tbody>
@@ -115,13 +134,16 @@ function App() {
                     <td style={{ ...tStyle, fontWeight: 'bold' }}>{p.productName}</td>
                     <td style={tStyle}>{p.price} USD</td>
                     <td style={tStyle}>{p.stockLevel} db</td>
+                    <td style={{ ...tStyle,}}>
+                      {p.lastUpdated ? new Date(p.lastUpdated).toLocaleTimeString('hu-HU') : 'Never'}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </section>
         )}
-
+        {/* Customers view */}
         {view === 'customers' && (
           <section>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -193,7 +215,38 @@ function App() {
             </form>
           </section>
         )}
-
+        {/* Audit logs view */}
+        {view === 'logs' && (
+          <section>
+            <h2 style={{ color: '#0062cc' }}>System Audit Logs (Logging)</h2>
+            <div style={{ maxHeight: '400px', overflowY: 'auto', marginTop: '20px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#f8f9fa', textAlign: 'left', borderBottom: '2px solid #dee2e6', position: 'sticky', top: 0 }}>
+                    <th style={tStyle}>Date</th>
+                    <th style={tStyle}>Event Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...auditLogs].reverse().map(log => ( 
+                    <tr key={log.logID} style={{ borderBottom: '1px solid #eee' }}>
+                      <td style={{ ...tStyle, fontSize: '12px', color: '#666', whiteSpace: 'nowrap' }}>
+                        {new Date(log.eventDate).toLocaleString('hu-HU')}
+                      </td>
+                      <td style={{ 
+                        ...tStyle, 
+                        color: log.eventDescription.includes('FAILED') ? '#d32f2f' : '#2e7d32',
+                        fontWeight: 'bold' 
+                      }}>
+                        {log.eventDescription}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );

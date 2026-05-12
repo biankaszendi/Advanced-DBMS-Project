@@ -17,8 +17,17 @@ namespace backend.Services
 
         public async Task<bool> PlaceOrderAsync(OrderRequest request)
         {
+            string customerName = $"Unknown(ID:{request.CustomerID})";
+            string productName = $"Unknown(ID:{request.ProductID})";
+
             try
             {
+                var customer = await _context.Customers.FindAsync(request.CustomerID);
+                var product = await _context.Products.FindAsync(request.ProductID);
+                
+                if (customer != null) customerName = customer.FullName;
+                if (product != null) productName = product.ProductName;
+
                 var p1 = new SqlParameter("@CustomerID", request.CustomerID);
                 var p2 = new SqlParameter("@ProductID", request.ProductID);
                 var p3 = new SqlParameter("@Quantity", request.Quantity);
@@ -27,13 +36,24 @@ namespace backend.Services
                 await _context.Database.ExecuteSqlRawAsync(
                     "EXEC sp_PlaceOrder @CustomerID, @ProductID, @Quantity, @TotalAmount", 
                     p1, p2, p3, p4);
+
+                _context.AuditLogs.Add(new AuditLogModel 
+                { 
+                    EventDescription = $"SUCCESS: {customerName} ordered {request.Quantity}x {productName}." 
+                });
                 
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"SQL Error: {ex.Message}");
-                throw; 
+                _context.AuditLogs.Add(new AuditLogModel 
+                { 
+                    EventDescription = $"FAILED: Order by {customerName}. Reason: {ex.Message}" 
+                });
+                
+                await _context.SaveChangesAsync();
+                throw;
             }
         }
 
