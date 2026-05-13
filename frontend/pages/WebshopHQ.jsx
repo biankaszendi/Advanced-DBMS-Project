@@ -332,24 +332,24 @@ const handleShipOrder = async (orderId) => {
         {view === 'logs' && (
           <section>
             <h2 className="section-title">System Audit Logs (Logging)</h2>
-            <div style={{ maxHeight: '400px', overflowY: 'auto', marginTop: '20px' }}>
+            <div style={{ marginTop: '20px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{ backgroundColor: '#f8f9fa', textAlign: 'left', borderBottom: '2px solid #dee2e6', position: 'sticky', top: 0 }}>
+                  <tr style={{ backgroundColor: '#f8f9fa', textAlign: 'left', borderBottom: '2px solid #dee2e6' }}>
                     <th className="table-cell">Date</th>
                     <th className="table-cell">Event Description</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[...auditLogs].reverse().map(log => ( 
-                    <tr key={log.logID} style={{ borderBottom: '1px solid #eee' }}>
+                    <tr key={log.logId || log.logID} style={{ borderBottom: '1px solid #eee' }}>
                       <td className="table-cell" style={{ fontSize: '12px', color: '#666', whiteSpace: 'nowrap' }}>
                         {new Date(log.eventDate).toLocaleString('hu-HU')}
                       </td>
                       <td 
                         className="table-cell" 
                         style={{ 
-                          color: log.eventDescription.includes('FAILED') ? '#d32f2f' : '#2e7d32',
+                          color: log.eventDescription?.includes('FAILED') ? '#d32f2f' : '#2e7d32',
                           fontWeight: 'bold' 
                         }}
                       >
@@ -362,6 +362,7 @@ const handleShipOrder = async (orderId) => {
             </div>
           </section>
         )}
+        {/* Dashboard view */}
         {view === 'dashboard' && (
         <section>
           <h2 style={{ color: '#0062cc', marginBottom: '20px' }}>Business Intelligence Dashboard</h2>

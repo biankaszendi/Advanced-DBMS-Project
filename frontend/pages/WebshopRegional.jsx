@@ -94,7 +94,7 @@ const WebshopRegional = () => {
           onClick={() => setView("customers")}
           style={navButtonStyle(view === "customers")}
         >
-          <Users size={18} /> Editing Customers
+          <Users size={18} />Customers
         </button>
         <button
           onClick={fetchData}

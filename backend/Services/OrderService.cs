@@ -39,7 +39,8 @@ namespace backend.Services
 
                 _context.AuditLogs.Add(new AuditLogModel 
                 { 
-                    EventDescription = $"SUCCESS: {customerName} ordered {request.Quantity}x {productName}." 
+                    EventDescription = $"SUCCESS: {customerName} ordered {request.Quantity}x {productName}.", 
+                    EventDate = DateTime.Now
                 });
                 
                 await _context.SaveChangesAsync();
@@ -49,7 +50,8 @@ namespace backend.Services
             {
                 _context.AuditLogs.Add(new AuditLogModel 
                 { 
-                    EventDescription = $"FAILED: Order by {customerName}. Reason: {ex.Message}" 
+                    EventDescription = $"FAILED: Order by {customerName}. Reason: {ex.Message}", 
+                    EventDate = DateTime.Now
                 });
                 
                 await _context.SaveChangesAsync();
